@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include "IMU.h"
+#include "electronics/IMU.h"
 //control pins for left and right motors
 const int leftSpeed = 6; //means pin 9 on the Arduino controls the speed of left motor
 const int rightSpeed = 7;
