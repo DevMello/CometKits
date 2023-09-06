@@ -8,12 +8,7 @@ const int left2 = 4;
 const int right1 = 9;
 const int right2 = 8;
 
-// const int leftSpeed = 9; //means pin 9 on the Arduino controls the speed of left motor
-// const int rightSpeed = 5;
-// const int left1 = 3; //left 1 and left 2 control the direction of rotation of left motor
-// const int left2 = 2;
-// const int right1 = 8;
-// const int right2 = 4;
+
 
 const int MPU = 0x68; // MPU6050 I2C address
 float AccX, AccY, AccZ; //linear acceleration
