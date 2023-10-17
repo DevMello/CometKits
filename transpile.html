@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Converter</title>
+    <!-- Include Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Additional styles if needed */
+    </style>
+</head>
+<body class="bg-gray-200 p-4">
+    <div class="max-w-md mx-auto bg-white p-6 rounded-md shadow-md">
+        <h1 class="text-xl font-semibold mb-4">Code Converter</h1>
+        <textarea id="inputCode" class="w-full h-40 p-2 rounded-md border" placeholder="Enter your code here..."></textarea>
+        <button id="convertButton" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">Convert</button>
+        <div class="mt-4">
+            <h2 class="text-lg font-semibold mb-2">Converted Code:</h2>
+            <pre id="outputCode" class="bg-gray-100 p-2 rounded-md overflow-x-auto"></pre>
+        </div>
+    </div>
+
+  <script>
+      // JavaScript code to convert input code
+      document.getElementById('convertButton').addEventListener('click', function () {
+          const inputCode = document.getElementById('inputCode').value;
+          const convertedCode = convertCode(inputCode);
+          document.getElementById('outputCode').textContent = convertedCode;
+      });
+
+      function convertCode(inputCode) {
+          // Split the input code into lines
+          const lines = inputCode.split('\n');
+
+          // Initialize variables for the converted code
+          let convertedCode = `
+  switch (state) {
+  `;
+
+          let state = -1;
+
+          // Initialize a variable to track the total time
+          let totalTime = 0;
+
+          // Initialize a flag to indicate if stopCar() has been added
+          let stopCarAdded = false;
+
+          // Iterate through each line of input code
+          for (const line of lines) {
+              // Use regular expression to match commands with optional fractional time values
+              const commandMatch = line.match(/(forward|left|right)\((\d*(?:\.\d+)?)\);/);
+
+              if (commandMatch) {
+                  const command = commandMatch[1];
+                  const time = parseFloat(commandMatch[2]);
+                  const timeMs = Math.round(time * 1000); // Convert to milliseconds
+
+                  // Calculate the time to wait before executing the command
+                  const waitTimeMs = timeMs - totalTime;
+                  totalTime += waitTimeMs; // Increment totalTime before waiting
+
+                  // Add a case for the wait time
+                  if (waitTimeMs > 0) {
+                      state++; // Increment state for wait
+                      convertedCode += `
+      case ${state}:
+        if (elapsedTime < ${waitTimeMs}) {
+
+        } else {
+          state = ${state + 1};
+          startTime = currentTime;
+        }
+        break;
+  `;
+                  }
+
+                  // Add a case for the matched command
+                  state++; // Increment state for command
+                  convertedCode += `
+      case ${state}:
+        if (elapsedTime < ${timeMs}) {
+          ${command}();
+        } else {
+          state = ${state + 1};
+          startTime = currentTime;
+        }
+        break;
+  `;
+              }
+          }
+
+          // If stopCar() hasn't been added yet, add it to the last case
+          if (!stopCarAdded) {
+              stopCarAdded = true;
+              state++; // Increment state for stopCar
+              convertedCode += `
+      case ${state}:
+        stopCar();
+        break;
+  `;
+          }
+
+          // Add a closing brace for the switch statement
+          convertedCode += `
+  }`;
+          return convertedCode;
+      }
+  </script>
+</body>
+</html>
